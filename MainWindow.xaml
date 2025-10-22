@@ -1,0 +1,137 @@
+﻿<Window x:Class="TheCommonersMap.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="The Commoners Map" Height="800" Width="1000"
+        Background="Black">
+    <DockPanel LastChildFill="True">
+        <!-- Top controls -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="Black" Margin="8" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" Margin="4" VerticalAlignment="Center">
+                <TextBlock Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0">Depth</TextBlock>
+                <Slider x:Name="DepthSlider" Minimum="2" Maximum="8" Width="120" Value="4" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,12,0"/>
+                <TextBlock x:Name="DepthLabel" Foreground="White" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
+                <TextBlock Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0">Max Branches</TextBlock>
+                <Slider x:Name="MaxBranchSlider" Minimum="1" Maximum="4" Width="120" Value="2" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,12,0"/>
+                <TextBlock x:Name="MaxBranchLabel" Foreground="White" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
+                <TextBlock Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0">Stage</TextBlock>
+                <ComboBox x:Name="StageCombo" Width="120" SelectedIndex="1">
+                    <ComboBoxItem>Easy</ComboBoxItem>
+                    <ComboBoxItem>Normal</ComboBoxItem>
+                    <ComboBoxItem>Hard</ComboBoxItem>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
+                <TextBlock Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0">Seed</TextBlock>
+                <TextBox x:Name="SeedBox" Width="100" Text="random" Margin="0,0,6,0"/>
+                <Button x:Name="RandomizeSeedBtn" Content="Randomize" Margin="0,0,6,0" Click="RandomizeSeedBtn_Click"/>
+                <Button x:Name="GenerateBtn" Content="Generate" Click="GenerateBtn_Click"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
+                <TextBlock Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0">Zoom</TextBlock>
+                <Slider x:Name="ZoomSlider" Minimum="0.4" Maximum="1.8" Value="1.0" Width="140" Margin="0,0,8,0" ValueChanged="ZoomSlider_ValueChanged"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Weight controls area -->
+        <Border DockPanel.Dock="Left" BorderBrush="Gray" BorderThickness="0" Background="#0A000000" Padding="6" Width="240">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <TextBlock Text="Node Weights (higher = more common)" Foreground="White" Margin="0,0,0,6"/>
+                    <!-- We'll create one row per node type with a slider and label -->
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="Battle" Foreground="LightBlue" Width="110"/>
+                        <Slider x:Name="WeightBattle" Minimum="0" Maximum="10" Value="6" Width="90" ValueChanged="WeightSlider_ValueChanged"/>
+                        <TextBlock x:Name="WeightBattleLabel" Foreground="White" Width="30"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="Mini Boss" Foreground="Orange" Width="110"/>
+                        <Slider x:Name="WeightMiniBoss" Minimum="0" Maximum="10" Value="1" Width="90" ValueChanged="WeightSlider_ValueChanged"/>
+                        <TextBlock x:Name="WeightMiniBossLabel" Foreground="White" Width="30"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="Chest" Foreground="Gold" Width="110"/>
+                        <Slider x:Name="WeightChest" Minimum="0" Maximum="10" Value="3" Width="90" ValueChanged="WeightSlider_ValueChanged"/>
+                        <TextBlock x:Name="WeightChestLabel" Foreground="White" Width="30"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="Shop" Foreground="LightGreen" Width="110"/>
+                        <Slider x:Name="WeightShop" Minimum="0" Maximum="10" Value="2" Width="90" ValueChanged="WeightSlider_ValueChanged"/>
+                        <TextBlock x:Name="WeightShopLabel" Foreground="White" Width="30"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="Gym" Foreground="Violet" Width="110"/>
+                        <Slider x:Name="WeightGym" Minimum="0" Maximum="10" Value="1" Width="90" ValueChanged="WeightSlider_ValueChanged"/>
+                        <TextBlock x:Name="WeightGymLabel" Foreground="White" Width="30"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="Campfire" Foreground="LightSalmon" Width="110"/>
+                        <Slider x:Name="WeightCampfire" Minimum="0" Maximum="10" Value="2" Width="90" ValueChanged="WeightSlider_ValueChanged"/>
+                        <TextBlock x:Name="WeightCampfireLabel" Foreground="White" Width="30"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="RandomEvent (?)" Foreground="White" Width="110"/>
+                        <Slider x:Name="WeightRandomEvent" Minimum="0" Maximum="10" Value="1" Width="90" ValueChanged="WeightSlider_ValueChanged"/>
+                        <TextBlock x:Name="WeightRandomEventLabel" Foreground="White" Width="30"/>
+                    </StackPanel>
+
+                    <Separator Margin="0,6"/>
+                    <TextBlock Text="Stage presets:" Foreground="White" Margin="0,6,0,3"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Button Content="Apply Easy" Click="ApplyEasy_Click" Margin="0,0,6,0"/>
+                        <Button Content="Apply Normal" Click="ApplyNormal_Click" Margin="0,0,6,0"/>
+                        <Button Content="Apply Hard" Click="ApplyHard_Click" Margin="0,0,6,0"/>
+                    </StackPanel>
+
+                    <Slider x:Name="LinearitySlider"
+                        Minimum="0" Maximum="1" Value="0.5"
+                        TickFrequency="0.1" IsSnapToTickEnabled="True"
+                        Width="150" Margin="10"/>
+                    <TextBlock Text="Linearity" Foreground="White" Margin="10,0,0,0"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="Width" 
+                           Foreground="White" 
+                           VerticalAlignment="Center" 
+                           Margin="0,0,8,0"/>
+
+                       <Slider x:Name="MaxNodesPerLevelSlider"
+                        Minimum="1"
+                        Maximum="9"
+                        Value="6"
+                        TickFrequency="1"
+                        IsSnapToTickEnabled="True"
+                        Width="150"/>
+
+                       <TextBlock Text="{Binding ElementName=MaxNodesPerLevelSlider, Path=Value, StringFormat=F0}" 
+                           Foreground="White" 
+                           VerticalAlignment="Center" 
+                           Margin="8,0,0,0"/>
+                    </StackPanel>
+
+
+
+
+                    <TextBlock Text="(Random Event scenarios can be edited in code.)" Foreground="Gray" FontSize="11" Margin="0,8,0,0"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Main scroll + canvas -->
+        <ScrollViewer x:Name="MainScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Background="Black">
+            <Grid>
+                <!-- We'll host the canvas inside a viewbox-like transform (scale transform for zoom) -->
+                <Canvas x:Name="MapCanvas" Background="Black">
+                    <!-- Lines and node buttons added dynamically -->
+                </Canvas>
+            </Grid>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
