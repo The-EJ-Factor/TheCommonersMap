@@ -10,6 +10,10 @@ namespace TheCommonersMap
 {
     public partial class MainWindow : Window
     {
+        private List<MapNode> currentNodes = new();
+
+        private MapNode pendingAddConnectionNode;
+        private MapNode pendingRemoveConnectionNode;
         enum NodeType { Start, Battle, MiniBoss, Chest, Shop, Anvil, Scientist, Campfire, RandomEvent, FinalBoss }
 
         class MapNode
@@ -403,6 +407,7 @@ namespace TheCommonersMap
             {
                 AddNodeButton(node);
             }
+            currentNodes = nodes;
         }
 
         NodeType PickNodeTypeByWeight(Dictionary<NodeType, int> weights)
@@ -466,6 +471,11 @@ namespace TheCommonersMap
             Canvas.SetTop(btn, node.Position.Y - btn.Height / 2);
 
             btn.Click += NodeButton_Click;
+            if (node.Type != NodeType.Start &&
+            node.Type != NodeType.FinalBoss)
+            {
+                btn.ContextMenu = BuildNodeContextMenu(node);
+            }
             node.ButtonControl = btn;
 
             // special visual for Start and FinalBoss
@@ -513,6 +523,17 @@ namespace TheCommonersMap
         {
             if (!(sender is Button b)) return;
             var node = b.Tag as MapNode;
+            if (pendingAddConnectionNode != null)
+            {
+                FinishAddConnection(node);
+                return;
+            }
+
+            if (pendingRemoveConnectionNode != null)
+            {
+                FinishRemoveConnection(node);
+                return;
+            }
             if (node == null) return;
 
             switch (node.Type)
@@ -569,6 +590,243 @@ namespace TheCommonersMap
                 // Show a random scenario from list
                 int i = rng.Next(randomEventScenarios.Count);
                 MessageBox.Show(randomEventScenarios[i], "Random Event", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+        private ContextMenu BuildNodeContextMenu(MapNode node)
+        {
+            ContextMenu menu = new ContextMenu();
+
+            AddTypeMenuItem(menu, node, NodeType.Battle);
+            AddTypeMenuItem(menu, node, NodeType.MiniBoss);
+            AddTypeMenuItem(menu, node, NodeType.Chest);
+            AddTypeMenuItem(menu, node, NodeType.Shop);
+            AddTypeMenuItem(menu, node, NodeType.Anvil);
+            AddTypeMenuItem(menu, node, NodeType.Scientist);
+            AddTypeMenuItem(menu, node, NodeType.Campfire);
+            AddTypeMenuItem(menu, node, NodeType.RandomEvent);
+
+            menu.Items.Add(new Separator());
+
+            MenuItem addConnection = new MenuItem
+            {
+                Header = "Add Connection"
+            };
+
+            addConnection.Click += (s, e) =>
+            {
+                BeginAddConnection(node);
+            };
+
+            menu.Items.Add(addConnection);
+
+            MenuItem removeConnection = new MenuItem
+            {
+                Header = "Remove Connection"
+            };
+
+            removeConnection.Click += (s, e) =>
+            {
+                BeginRemoveConnection(node);
+            };
+
+            menu.Items.Add(removeConnection);
+
+            menu.Items.Add(new Separator());
+
+            MenuItem deleteNode = new MenuItem
+            {
+                Header = "Delete Node"
+            };
+
+            deleteNode.Click += (s, e) =>
+            {
+                DeleteNode(node);
+            };
+
+            menu.Items.Add(deleteNode);
+
+            return menu;
+        }
+        private void AddTypeMenuItem(
+        ContextMenu menu,
+        MapNode node,
+        NodeType type)
+        {
+            MenuItem item = new MenuItem
+            {
+                Header = GetTypeDisplayName(type)
+            };
+
+            item.Click += (s, e) =>
+            {
+                node.Type = type;
+                RefreshMap();
+            };
+
+            menu.Items.Add(item);
+        }
+        private string GetTypeDisplayName(NodeType type)
+        {
+            switch (type)
+            {
+                case NodeType.Battle: return "Battle";
+                case NodeType.MiniBoss: return "Mini Boss";
+                case NodeType.Chest: return "Chest";
+                case NodeType.Shop: return "Shop";
+                case NodeType.Anvil: return "Anvil";
+                case NodeType.Scientist: return "Scientist";
+                case NodeType.Campfire: return "Campfire";
+                case NodeType.RandomEvent: return "Random Event";
+                default: return type.ToString();
+            }
+        }
+        private void BeginAddConnection(MapNode node)
+        {
+            pendingRemoveConnectionNode = null;
+            pendingAddConnectionNode = node;
+
+            HighlightValidConnectionTargets(node);
+
+            MessageBox.Show(
+                "Click another node to create a connection.",
+                "Add Connection");
+        }
+        private void BeginRemoveConnection(MapNode node)
+        {
+            pendingAddConnectionNode = null;
+            pendingRemoveConnectionNode = node;
+
+            HighlightConnectedTargets(node);
+
+            MessageBox.Show(
+                "Click a connected node to remove the connection.",
+                "Remove Connection");
+        }
+        private void HighlightValidConnectionTargets(MapNode source)
+        {
+            foreach (var node in currentNodes)
+            {
+                if (node == source)
+                    continue;
+
+                if (node.Level == source.Level)
+                    continue;
+
+                node.ButtonControl.BorderBrush = Brushes.Yellow;
+                node.ButtonControl.BorderThickness = new Thickness(3);
+            }
+        }
+        private void HighlightConnectedTargets(MapNode source)
+        {
+            foreach (var node in currentNodes)
+            {
+                bool connected =
+                    source.Children.Contains(node) ||
+                    node.Children.Contains(source);
+
+                if (!connected)
+                    continue;
+
+                node.ButtonControl.BorderBrush = Brushes.Orange;
+                node.ButtonControl.BorderThickness = new Thickness(3);
+            }
+        }
+        private void ResetNodeBorders()
+        {
+            foreach (var node in currentNodes)
+            {
+                if (node.ButtonControl == null)
+                    continue;
+
+                node.ButtonControl.BorderThickness = new Thickness(1);
+
+                if (node.Type == NodeType.Start)
+                    node.ButtonControl.BorderBrush = Brushes.Cyan;
+                else if (node.Type == NodeType.FinalBoss)
+                    node.ButtonControl.BorderBrush = Brushes.Red;
+                else
+                    node.ButtonControl.BorderBrush = Brushes.Gray;
+            }
+        }
+        private void FinishAddConnection(MapNode target)
+        {
+            MapNode source = pendingAddConnectionNode;
+
+            pendingAddConnectionNode = null;
+
+            if (source == target)
+            {
+                ResetNodeBorders();
+                return;
+            }
+
+            MapNode parent;
+            MapNode child;
+
+            if (source.Level < target.Level)
+            {
+                parent = source;
+                child = target;
+            }
+            else
+            {
+                parent = target;
+                child = source;
+            }
+
+            if (!parent.Children.Contains(child))
+            {
+                parent.Children.Add(child);
+            }
+
+            ResetNodeBorders();
+            RefreshMap();
+        }
+        private void FinishRemoveConnection(MapNode target)
+        {
+            MapNode source = pendingRemoveConnectionNode;
+
+            pendingRemoveConnectionNode = null;
+
+            if (source.Children.Contains(target))
+                source.Children.Remove(target);
+
+            if (target.Children.Contains(source))
+                target.Children.Remove(source);
+
+            ResetNodeBorders();
+            RefreshMap();
+        }
+        private void DeleteNode(MapNode node)
+        {
+            if (node.Type == NodeType.Start ||
+                node.Type == NodeType.FinalBoss)
+                return;
+
+            foreach (var n in currentNodes)
+            {
+                n.Children.Remove(node);
+            }
+
+            currentNodes.Remove(node);
+
+            RefreshMap();
+        }
+        private void RefreshMap()
+        {
+            MapCanvas.Children.Clear();
+
+            foreach (var node in currentNodes)
+            {
+                foreach (var child in node.Children)
+                {
+                    DrawConnection(node.Position, child.Position);
+                }
+            }
+
+            foreach (var node in currentNodes)
+            {
+                AddNodeButton(node);
             }
         }
     }
