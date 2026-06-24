@@ -67,9 +67,14 @@
                         <TextBlock x:Name="WeightShopLabel" Foreground="White" Width="30"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,2">
-                        <TextBlock Text="Gym" Foreground="Violet" Width="110"/>
-                        <Slider x:Name="WeightGym" Minimum="0" Maximum="10" Value="1" Width="90" ValueChanged="WeightSlider_ValueChanged"/>
-                        <TextBlock x:Name="WeightGymLabel" Foreground="White" Width="30"/>
+                        <TextBlock Text="Anvil" Foreground="Violet" Width="110"/>
+                        <Slider x:Name="WeightAnvil" Minimum="0" Maximum="10" Value="1" Width="90" ValueChanged="WeightSlider_ValueChanged"/>
+                        <TextBlock x:Name="WeightAnvilLabel" Foreground="White" Width="30"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="Scientist" Foreground="Green" Width="110"/>
+                        <Slider x:Name="WeightScientist" Minimum="0" Maximum="10" Value="1" Width="90" ValueChanged="WeightSlider_ValueChanged"/>
+                        <TextBlock x:Name="WeightScientistLabel" Foreground="White" Width="30"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,2">
                         <TextBlock Text="Campfire" Foreground="LightSalmon" Width="110"/>

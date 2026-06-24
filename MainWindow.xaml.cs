@@ -10,7 +10,7 @@ namespace TheCommonersMap
 {
     public partial class MainWindow : Window
     {
-        enum NodeType { Start, Battle, MiniBoss, Chest, Shop, Gym, Campfire, RandomEvent, FinalBoss }
+        enum NodeType { Start, Battle, MiniBoss, Chest, Shop, Anvil, Scientist, Campfire, RandomEvent, FinalBoss }
 
         class MapNode
         {
@@ -31,7 +31,8 @@ namespace TheCommonersMap
             { NodeType.MiniBoss, Brushes.Orange },
             { NodeType.Chest, Brushes.Gold },
             { NodeType.Shop, Brushes.LightGreen },
-            { NodeType.Gym, Brushes.Violet },
+            { NodeType.Anvil, Brushes.Violet },
+            { NodeType.Scientist, Brushes.Green },
             { NodeType.Campfire, Brushes.LightSalmon },
             { NodeType.RandomEvent, Brushes.White },
             { NodeType.FinalBoss, Brushes.Red }
@@ -45,7 +46,6 @@ namespace TheCommonersMap
         {
             "You find a lost traveler who offers a useful item.",
             "A trap! Avoid or take damage.",
-            "A fortune teller offers a prophecy (free info).",
             "An NPC asks for help — choose reward."
         };
 
@@ -80,7 +80,8 @@ namespace TheCommonersMap
         (WeightMiniBoss, WeightMiniBossLabel),
         (WeightChest, WeightChestLabel),
         (WeightShop, WeightShopLabel),
-        (WeightGym, WeightGymLabel),
+        (WeightAnvil, WeightAnvilLabel),
+        (WeightScientist, WeightScientistLabel),
         (WeightCampfire, WeightCampfireLabel),
         (WeightRandomEvent, WeightRandomEventLabel)
             };
@@ -131,34 +132,36 @@ namespace TheCommonersMap
 
         private void ApplyEasy_Click(object sender, RoutedEventArgs e)
         {
-            // easier: more chests/shops, fewer battles
-            WeightBattle.Value = 5;
-            WeightMiniBoss.Value = 0;
-            WeightChest.Value = 5;
-            WeightShop.Value = 3;
-            WeightGym.Value = 1;
-            WeightCampfire.Value = 3;
+            WeightBattle.Value = 3;
+            WeightMiniBoss.Value = 1;
+            WeightChest.Value = 1;
+            WeightShop.Value = 1;
+            WeightAnvil.Value = 1;
+            WeightScientist.Value = 1;
+            WeightCampfire.Value = 1;
             WeightRandomEvent.Value = 1;
         }
 
         private void ApplyNormal_Click(object sender, RoutedEventArgs e)
         {
-            WeightBattle.Value = 6;
-            WeightMiniBoss.Value = 1;
-            WeightChest.Value = 3;
-            WeightShop.Value = 2;
-            WeightGym.Value = 1;
-            WeightCampfire.Value = 2;
+            WeightBattle.Value = 4;
+            WeightMiniBoss.Value = 2;
+            WeightChest.Value = 1;
+            WeightShop.Value = 1;
+            WeightAnvil.Value = 1;
+            WeightScientist.Value = 1;
+            WeightCampfire.Value = 1;
             WeightRandomEvent.Value = 1;
         }
 
         private void ApplyHard_Click(object sender, RoutedEventArgs e)
         {
-            WeightBattle.Value = 8;
-            WeightMiniBoss.Value = 2;
+            WeightBattle.Value = 4;
+            WeightMiniBoss.Value = 3;
             WeightChest.Value = 1;
-            WeightShop.Value = 0;
-            WeightGym.Value = 0;
+            WeightShop.Value = 1;
+            WeightAnvil.Value = 1;
+            WeightScientist.Value = 1;
             WeightCampfire.Value = 1;
             WeightRandomEvent.Value = 1;
         }
@@ -196,7 +199,8 @@ namespace TheCommonersMap
                 { NodeType.MiniBoss, (int)WeightMiniBoss.Value },
                 { NodeType.Chest, (int)WeightChest.Value },
                 { NodeType.Shop, (int)WeightShop.Value },
-                { NodeType.Gym, (int)WeightGym.Value },
+                { NodeType.Anvil, (int)WeightAnvil.Value },
+                { NodeType.Scientist, (int)WeightScientist.Value },
                 { NodeType.Campfire, (int)WeightCampfire.Value },
                 { NodeType.RandomEvent, (int)WeightRandomEvent.Value }
             };
@@ -357,7 +361,6 @@ namespace TheCommonersMap
             // layout: compute width per level and set canvas size
             double horizontalSpacing = 160; // base spacing
             double verticalSpacing = 140;
-            // compute widest level
             int widest = allLevels.Max(l => l.Count);
             double canvasWidth = Math.Max(800, widest * horizontalSpacing + 200);
             double canvasHeight = (allLevels.Count + 1) * verticalSpacing + 200;
@@ -366,7 +369,7 @@ namespace TheCommonersMap
             MapCanvas.Height = canvasHeight;
             MapCanvas.Background = Brushes.Black;
 
-            // position nodes in each level centered horizontally
+            // position nodes in each deapth centered horizontally
             for (int lvl = 0; lvl < allLevels.Count; lvl++)
             {
                 var list = allLevels[lvl];
@@ -383,11 +386,10 @@ namespace TheCommonersMap
                 }
             }
 
-            // draw lines first (parents -> children)
-            // gather unique nodes
+            // draw lines (parents -> children)
             var nodes = allLevels.SelectMany(l => l).ToList();
 
-            // draw connections (white)
+            // draw connections
             foreach (var node in nodes)
             {
                 foreach (var child in node.Children)
@@ -396,7 +398,7 @@ namespace TheCommonersMap
                 }
             }
 
-            // add buttons for nodes (on top)
+            // add buttons
             foreach (var node in nodes)
             {
                 AddNodeButton(node);
@@ -498,7 +500,8 @@ namespace TheCommonersMap
                 case NodeType.MiniBoss: return "Mini Boss/Special Encounter";
                 case NodeType.Chest: return "Chest";
                 case NodeType.Shop: return "Shop";
-                case NodeType.Gym: return "Gym";
+                case NodeType.Anvil: return "Anvil";
+                case NodeType.Scientist: return "Scientist";
                 case NodeType.Campfire: return "Campfire";
                 case NodeType.RandomEvent: return "?";
                 case NodeType.FinalBoss: return "Boss";
@@ -521,7 +524,8 @@ namespace TheCommonersMap
                 case NodeType.MiniBoss:
                 case NodeType.Chest:
                 case NodeType.Shop:
-                case NodeType.Gym:
+                case NodeType.Anvil:
+                case NodeType.Scientist:
                 case NodeType.Campfire:
                     MessageBox.Show($"Node: {NodeLabel(node)}\n(Level {node.Level})", "Node Info", MessageBoxButton.OK, MessageBoxImage.Information);
                     break;
@@ -536,9 +540,8 @@ namespace TheCommonersMap
 
         private void ResolveRandomEvent(MapNode node, Button button)
         {
-            // 50% chance to convert into another node type, otherwise show scenario
             int choice = rng.Next(100);
-            if (choice < 50)
+            if (choice < 30)
             {
                 // convert into one of the other types (weighted by same weights)
                 var weights = new Dictionary<NodeType, int>
@@ -547,7 +550,8 @@ namespace TheCommonersMap
                     { NodeType.MiniBoss, (int)WeightMiniBoss.Value },
                     { NodeType.Chest, (int)WeightChest.Value },
                     { NodeType.Shop, (int)WeightShop.Value },
-                    { NodeType.Gym, (int)WeightGym.Value },
+                    { NodeType.Anvil, (int)WeightAnvil.Value },
+                    { NodeType.Scientist, (int)WeightScientist.Value },
                     { NodeType.Campfire, (int)WeightCampfire.Value },
                     { NodeType.RandomEvent, (int)WeightRandomEvent.Value } // could convert to another random event
                 };
