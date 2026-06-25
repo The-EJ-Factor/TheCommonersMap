@@ -8,13 +8,13 @@
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="Black" Margin="8" VerticalAlignment="Top">
             <StackPanel Orientation="Horizontal" Margin="4" VerticalAlignment="Center">
                 <TextBlock Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0">Depth</TextBlock>
-                <Slider x:Name="DepthSlider" Minimum="2" Maximum="8" Width="120" Value="4" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,12,0"/>
+                <Slider x:Name="DepthSlider" Minimum="2" Maximum="20" Width="120" Value="7" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,12,0"/>
                 <TextBlock x:Name="DepthLabel" Foreground="White" VerticalAlignment="Center"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
                 <TextBlock Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0">Max Branches</TextBlock>
-                <Slider x:Name="MaxBranchSlider" Minimum="1" Maximum="4" Width="120" Value="2" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,12,0"/>
+                <Slider x:Name="MaxBranchSlider" Minimum="1" Maximum="4" Width="120" Value="3" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,12,0"/>
                 <TextBlock x:Name="MaxBranchLabel" Foreground="White" VerticalAlignment="Center"/>
             </StackPanel>
 
