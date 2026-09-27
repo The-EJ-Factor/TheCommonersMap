@@ -19,19 +19,24 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
-                <TextBlock Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0">Stage</TextBlock>
-                <ComboBox x:Name="StageCombo" Width="120" SelectedIndex="1">
-                    <ComboBoxItem>Easy</ComboBoxItem>
-                    <ComboBoxItem>Normal</ComboBoxItem>
-                    <ComboBoxItem>Hard</ComboBoxItem>
-                </ComboBox>
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
                 <TextBlock Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0">Seed</TextBlock>
                 <TextBox x:Name="SeedBox" Width="100" Text="random" Margin="0,0,6,0"/>
                 <Button x:Name="RandomizeSeedBtn" Content="Randomize" Margin="0,0,6,0" Click="RandomizeSeedBtn_Click"/>
                 <Button x:Name="GenerateBtn" Content="Generate" Click="GenerateBtn_Click"/>
+
+                <Button x:Name="EditRandomEventsBtn"
+                        Content="Random Events"
+                        Margin="12,0,6,0"
+                        Click="EditRandomEventsBtn_Click"/>
+
+                <Button x:Name="SaveBtn"
+                        Content="Save"
+                        Margin="0,0,6,0"
+                        Click="SaveBtn_Click"/> 
+
+                <Button x:Name="LoadBtn"
+                        Content="Load"
+                        Click="LoadBtn_Click"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
@@ -124,7 +129,7 @@
 
 
 
-                    <TextBlock Text="(Random Event scenarios can be edited in code.)" Foreground="Gray" FontSize="11" Margin="0,8,0,0"/>
+                    <!--TextBlock Text="(Random Event scenarios can be edited in code.)" Foreground="Gray" FontSize="11" Margin="0,8,0,0"/-->
                 </StackPanel>
             </ScrollViewer>
         </Border>
@@ -133,8 +138,9 @@
         <ScrollViewer x:Name="MainScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Background="Black">
             <Grid>
                 <!-- We'll host the canvas inside a viewbox-like transform (scale transform for zoom) -->
-                <Canvas x:Name="MapCanvas" Background="Black">
-                    <!-- Lines and node buttons added dynamically -->
+                <Canvas x:Name="MapCanvas"
+                    Background="Black"
+                    MouseRightButtonDown="MapCanvas_MouseRightButtonDown">  
                 </Canvas>
             </Grid>
         </ScrollViewer>
